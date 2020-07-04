@@ -11,9 +11,9 @@ class JawabanController extends Controller
     public function index($id)
     {
         $pertanyaan = Pertanyaan::find($id);
-        $jawaban = Jawaban::where('coment_id', $id)->first();
+        $jawaban = Jawaban::where('coment_id', $id)->get();
 
-        return view('jawaban.index', compact('pertanyaan','jawaban'));
+        return view('jawaban.index', compact('pertanyaan', 'jawaban'));
     }
 
     public function store(JawabanRequest $request, $id)
@@ -21,17 +21,12 @@ class JawabanController extends Controller
         $jawaban = Jawaban::where('coment_id', $id)->first();
 
         $attr = $request->all();
+        $attr['isi'] = nl2br($attr['isi']);
         $attr['tgl_buat'] = date('Y-m-d');
         $attr['tgl_diperbaharui'] = date('Y-m-d');
         $attr['coment_id'] = $id;
 
-        if (is_null($jawaban)) {
-            Jawaban::create($attr);
-        } else {
-            $jawaban->isi = $attr['isi'];
-            $jawaban->tgl_diperbaharui = date('Y-m-d');
-            $jawaban->update();
-        }
+        Jawaban::create($attr);
 
         return back()->with('alert-success', 'Berhasil menyimpan jawaban.');
     }
